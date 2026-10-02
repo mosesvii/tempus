@@ -1729,7 +1729,18 @@
   /* Simple one-and-done day: just the Total hours form, no Duration Entries list chrome around it. */
   #modal-day-entry.is-simple-quick section[aria-labelledby="day-duration-title"] .ts-day-section-head,
   #modal-day-entry.is-simple-quick .ts-day-duration-row,
-  #modal-day-entry.is-simple-quick .ts-day-duration-add { display:none; }
+  #modal-day-entry.is-simple-quick .ts-day-duration-add,
+  #modal-day-entry.is-simple-quick .ts-day-overall,
+  #modal-day-entry.is-simple-quick .ts-day-editor-section--day { display:none; }
+  /* …and the form sits bare in the narrow modal like the old Basic tab: no list box, no accent bar,
+     full-width submit with Delete/Cancel beneath. */
+  #modal-day-entry.is-simple-quick .ts-modal-content { max-width:470px; }
+  #modal-day-entry.is-simple-quick section[aria-labelledby="day-duration-title"] { padding-bottom:0; }
+  #modal-day-entry.is-simple-quick .ts-day-duration-list { border:0; border-radius:0; overflow:visible; }
+  #modal-day-entry.is-simple-quick .ts-day-duration-editor { padding:0; background:none; box-shadow:none; border-top:0; }
+  #modal-day-entry.is-simple-quick .ts-day-duration-editor .ts-entry-actions { flex-direction:column; align-items:stretch; }
+  #modal-day-entry.is-simple-quick .ts-day-duration-editor .ts-entry-submit { width:100%; }
+  #modal-day-entry.is-simple-quick .ts-day-duration-editor .ts-entry-actions-row { margin-right:0; }
   .ts-day-section-head { display:flex; align-items:baseline; justify-content:space-between; gap:var(--space-3); margin-bottom:8px; }
   .ts-day-section-head h3 { margin:0; color:var(--text); font-size:14px; font-weight:700; letter-spacing:-0.005em; }
   .ts-day-section-total { display:flex; align-items:baseline; gap:6px; }

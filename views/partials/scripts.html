@@ -12868,8 +12868,11 @@ function updateDeductionFormVisibility() {
   }
 
   function setManualMode(isEdit) {
-    if (manualSaveBtn) manualSaveBtn.textContent = isEdit ? 'Save changes' : 'Add duration';
-    if (manualCancelBtn) manualCancelBtn.style.display = 'inline-flex';
+    if (manualSaveBtn) manualSaveBtn.textContent = daySimpleQuick
+      ? (isEdit ? 'Update entry' : 'Add entry')
+      : (isEdit ? 'Save changes' : 'Add duration');
+    // Simple days close on Esc/backdrop, so a new entry needs no Cancel (as in the old Basic tab).
+    if (manualCancelBtn) manualCancelBtn.style.display = (daySimpleQuick && !isEdit) ? 'none' : 'inline-flex';
     if (manualDeleteBtn) manualDeleteBtn.style.display = isEdit ? 'inline-flex' : 'none';
   }
 
@@ -24338,6 +24341,7 @@ function getCachedIncomeSummary(monthKey) {
       const option = document.createElement('option');
       option.value = hourType.id;
       option.textContent = hourType.name;
+      if (hourType.color) option.dataset.color = hourType.color;
       manualHourType.appendChild(option);
     });
     const selected = options.some((hourType) => String(hourType.id) === String(currentId))
