@@ -13136,12 +13136,14 @@ function updateDeductionFormVisibility() {
     state.editingEntryType = null;
     parkDayDurationEditor();
     renderCalendar();
+    if (daySimpleQuick) { closeDayModal(true); return; }
     renderDayEditor(state.selectedCalendarDate);
   };
   manualCancelBtn.onclick = function () {
     dayDurationDraft = null;
     clearManualEditing();
     parkDayDurationEditor();
+    if (daySimpleQuick) { closeDayModal(true); return; }
     renderDayDurationEntries(state.selectedCalendarDate);
   };
 
@@ -13177,7 +13179,8 @@ function updateDeductionFormVisibility() {
       updateTabStates();
       dayDurationDraft = null;
       parkDayDurationEditor();
-      renderDayEditor(currentDate);
+      if (daySimpleQuick) closeDayModal(true);
+      else renderDayEditor(currentDate);
       setStatus('Deleting entry...', 'warn');
 
       google.script.run
@@ -23484,6 +23487,7 @@ function getCachedIncomeSummary(monthKey) {
     updateTabStates();
     renderCalendar();
     const existingEntries = state.entries.filter(entry => entry.date === dateIso);
+    daySimpleQuick = isSimpleQuickDay(dateIso);
     openDayModal();
     // A targeted calendar marker/context row may expand an exact record, but only when the target resolves
     // uniquely. Ordinary day clicks deliberately leave every row collapsed in the complete day view.
@@ -23498,7 +23502,17 @@ function getCachedIncomeSummary(monthKey) {
     if (target) {
       if (resolveEntryType(target) === 'basic') beginDayDurationDraft(target);
       else if (entryPunches(target).length) enterDaySessionEdit(target.id, 0);
+    } else if (daySimpleQuick) {
+      beginDayDurationDraft(existingEntries.find((entry) => resolveEntryType(entry) === 'basic') || null);
     }
+  }
+
+  // Simple day = one-and-done: the day opens straight on Total hours for its duration entry (or a new one),
+  // and Enter saves and closes. Only when no Detailed contract/hour type applies, no session is logged, and
+  // there's at most one duration entry; anything else keeps the full multi-entry day editor.
+  function isSimpleQuickDay(dateIso) {
+    if (dayEntryModes(dateIso).detailed) return false;
+    return (state.entries || []).filter((entry) => entry && entry.date === dateIso && resolveEntryType(entry) === 'basic').length <= 1;
   }
 
   // --- Phase 1: Sessions "day at a glance" timeline (read-only) -------------------------------
@@ -24265,6 +24279,7 @@ function getCachedIncomeSummary(monthKey) {
   // (survives the timeline's innerHTML re-renders, like daySessionsEdit). Committed via Save → saveDayComment.
   let daySessionsCommentEdit = null;
   let dayModalOpener = null;
+  let daySimpleQuick = false; // the open day is a Simple one-and-done day (see isSimpleQuickDay)
   // The fixed-duration editor reuses the proven Basic form controls, but is mounted immediately beneath the
   // exact row being edited. Its snapshot lets close/switch guards distinguish a merely expanded row from a
   // genuinely dirty draft.
@@ -25927,6 +25942,7 @@ function getCachedIncomeSummary(monthKey) {
 
   function openDayModal() {
     const m = document.getElementById('modal-day-entry');
+    if (m) m.classList.toggle('is-simple-quick', daySimpleQuick);
     if (m) showModal(m);
     if (m && !m.__focusTrapWired) {
       m.addEventListener('keydown', (event) => {
@@ -25960,6 +25976,7 @@ function getCachedIncomeSummary(monthKey) {
     daySessionsPending = new Map(); // …and discard every buffered-but-unsaved session edit
     daySessionsCommentEdit = null; // …and any open (unsaved) comment editor
     dayDurationDraft = null;
+    daySimpleQuick = false;
     state.editingEntryId = null;
     state.editingEntryType = null;
     parkDayDurationEditor();

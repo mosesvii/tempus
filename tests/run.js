@@ -608,6 +608,11 @@ test('desktop day editor stacks timed sessions, exact duration rows, and day act
   assert.match(scripts, /Discard day changes\?/);
   assert.match(scripts, /function handleCalendarClick\(dateIso, targetHourTypeId, targetEntryId\)/);
   assert.match(scripts, /if \(matches\.length === 1\) target = matches\[0\]/);
+  // Simple days are one-and-done: open on Total hours, save/cancel/delete close the day.
+  assert.match(scripts, /function isSimpleQuickDay\(dateIso\)[\s\S]*?if \(dayEntryModes\(dateIso\)\.detailed\) return false;/);
+  assert.match(scripts, /\} else if \(daySimpleQuick\) \{\s*beginDayDurationDraft\(/);
+  assert.match(scripts, /renderCalendar\(\);\s*if \(daySimpleQuick\) \{ closeDayModal\(true\); return; \}/);
+  assert.match(styles, /#modal-day-entry\.is-simple-quick \.ts-day-duration-add/);
   assert.match(scripts, /hourTypeEffectiveEntryMode\(selectedHourType\) === 'detailed'/);
   assert.match(mobile, /state\.mode = hourTypeEffectiveEntryMode\(selected\) === 'detailed' \? 'punch' : 'manual'/);
   assert.match(scripts, /scheduleEntryMode\(draft\.contract_id, draft\.hour_type_id\)/);
