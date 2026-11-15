@@ -1,5 +1,10 @@
 /** Web entry + HTML includes */
 function doGet(e) {
+  // The native app's deployment runs as the owner for anyone with its URL (see backend/nativeApi.js).
+  // Never serve the web page there: someone who isn't signed in gets a blank notice instead.
+  if (nativeApiIsAnonymousVisitor_()) {
+    return HtmlService.createHtmlOutput('<p style="font-family:system-ui;padding:24px">This address is for the Tempus app.</p>').setTitle('Tempus');
+  }
   // Financial migrations are explicit: the user sees what will happen and a verified Drive backup
   // is created before any sheet is changed. The application cannot race a partial upgrade.
   var migrationStatus = api_getMigrationStatus();
