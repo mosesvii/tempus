@@ -1854,3 +1854,4 @@ require('./lil-assessments').run(test);
 require('./mobile-sync').run(test);
 
 require('./bas-ledger').run(test);
+require('./native-api').run(test);
